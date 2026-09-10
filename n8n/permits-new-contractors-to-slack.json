@@ -1,0 +1,195 @@
+{
+  "name": "Permits New Contractors to Slack",
+  "nodes": [
+    {
+      "id": "97730cf6-7064-4dd6-a21f-ceeb3dc5f1b6",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 7,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dc939d6b-c328-4db2-a303-83a6e338bedb",
+      "name": "Run Austin Permits",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "actor",
+        "operation": "runActorAndGetDataset",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "make_no_mistakes/us-building-permits-scraper"
+        },
+        "input": "{\n  \"cities\": [\n    \"austin\"\n  ],\n  \"daysBack\": 1,\n  \"maxItems\": 1000,\n  \"includeAdministrative\": false\n}"
+      },
+      "credentials": {
+        "apifyApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Apify account"
+        }
+      },
+      "notes": "Native Apify community node (@apify/n8n-nodes-apify). After import, open this node once: n8n may ask you to reselect the Actor from the picker and re-paste the Input JSON below, since this file was authored outside a live n8n instance so no personal Apify credential ID is baked in."
+    },
+    {
+      "id": "fe90acbc-2ad4-4671-927b-2172513e49a2",
+      "name": "Has Contractor Phone",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-phone",
+              "leftValue": "={{$json.contractor_phone}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "cda09440-8a6f-4d47-96bb-917e9eb6018a",
+      "name": "Dedupe New Contractors",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "compare": "selectedFields",
+        "fieldsToCompare": {
+          "fields": [
+            {
+              "fieldName": "contractor_phone"
+            },
+            {
+              "fieldName": "permit_number"
+            }
+          ]
+        },
+        "options": {
+          "scope": "workflow",
+          "historySize": 20000
+        }
+      },
+      "notes": "Uses n8n's built-in seen-before storage \u2014 no external Sheet/Data Store needed. Scope 'workflow' persists across the daily schedule runs. First run after import will treat every row as new; that's expected."
+    },
+    {
+      "id": "fa2e8994-461b-41eb-8640-78dcadeae68d",
+      "name": "Post New Contractor",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_CHANNEL_ID",
+          "cachedResultName": "#new-permits"
+        },
+        "text": "=New Austin permit with a contractor lead:\n*{{$json.contractor_name}}* \u2014 {{$json.contractor_phone}}\nPermit {{$json.permit_number}} ({{$json.permit_type}}), issued {{$json.issued_date}}\n{{$json.address}}, {{$json.zip}}\nWork: {{$json.work_description}}\nValuation: {{$json.valuation}}\n{{$json.source_url}}",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run Austin Permits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Austin Permits": {
+      "main": [
+        [
+          {
+            "node": "Has Contractor Phone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Contractor Phone": {
+      "main": [
+        [
+          {
+            "node": "Dedupe New Contractors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedupe New Contractors": {
+      "main": [
+        [
+          {
+            "node": "Post New Contractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

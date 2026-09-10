@@ -1,0 +1,137 @@
+{
+  "name": "Jobs Watchlist to Airtable",
+  "nodes": [
+    {
+      "id": "111331e9-0010-4451-871d-cf726a6d1d23",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 6,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d16875a8-b327-44cd-9217-ecf102e0a9ec",
+      "name": "Run ATS Watchlist",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "actor",
+        "operation": "runActorAndGetDataset",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "make_no_mistakes/multi-ats-job-board-api"
+        },
+        "input": "{\n  \"companies\": [\n    \"stripe\",\n    \"openai\",\n    \"ramp\",\n    \"anthropic\",\n    \"databricks\"\n  ],\n  \"postedWithinDays\": 1,\n  \"discoverOnly\": false,\n  \"maxItems\": 1000,\n  \"includeDescription\": true\n}"
+      },
+      "credentials": {
+        "apifyApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Apify account"
+        }
+      },
+      "notes": "Native Apify community node (@apify/n8n-nodes-apify). After import, open this node once: n8n may ask you to reselect the Actor from the picker and re-paste the Input JSON below, since this file was authored outside a live n8n instance so no personal Apify credential ID is baked in."
+    },
+    {
+      "id": "f331ff5a-855e-468e-aa8c-2620e3a1b5b7",
+      "name": "Upsert to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_BASE_ID",
+          "cachedResultName": "Job Watchlist"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_TABLE_ID",
+          "cachedResultName": "Jobs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "ats",
+            "job_id"
+          ],
+          "value": {
+            "company": "={{$json.company}}",
+            "ats": "={{$json.ats}}",
+            "job_id": "={{$json.job_id}}",
+            "title": "={{$json.title}}",
+            "department": "={{$json.department}}",
+            "location_raw": "={{$json.location_raw}}",
+            "is_remote": "={{$json.is_remote}}",
+            "employment_type": "={{$json.employment_type}}",
+            "salary_min": "={{$json.salary_min}}",
+            "salary_max": "={{$json.salary_max}}",
+            "salary_currency": "={{$json.salary_currency}}",
+            "posted_at": "={{$json.posted_at}}",
+            "apply_url": "={{$json.apply_url}}"
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Airtable account"
+        }
+      },
+      "notes": "matchingColumns = ['ats','job_id'] is the dedupe key \u2014 a job already in the base gets updated in place, a new one gets inserted."
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run ATS Watchlist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run ATS Watchlist": {
+      "main": [
+        [
+          {
+            "node": "Upsert to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

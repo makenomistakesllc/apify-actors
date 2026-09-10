@@ -1,0 +1,137 @@
+{
+  "name": "Permits Weekly to Google Sheets",
+  "nodes": [
+    {
+      "id": "d35c36b2-5767-4bc5-b9f6-ac2afa12611b",
+      "name": "Weekly Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9fcc231f-8a89-4fbf-8d63-aed5a172d92c",
+      "name": "Run Permits Actor",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "actor",
+        "operation": "runActorAndGetDataset",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "make_no_mistakes/us-building-permits-scraper"
+        },
+        "input": "{\n  \"cities\": [\n    \"austin\",\n    \"san-antonio\",\n    \"new-york\",\n    \"chicago\",\n    \"boston\"\n  ],\n  \"daysBack\": 7,\n  \"maxItems\": 5000,\n  \"includeAdministrative\": false\n}"
+      },
+      "credentials": {
+        "apifyApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Apify account"
+        }
+      },
+      "notes": "Native Apify community node (@apify/n8n-nodes-apify). After import, open this node once: n8n may ask you to reselect the Actor from the picker and re-paste the Input JSON below, since this file was authored outside a live n8n instance so no personal Apify credential ID is baked in."
+    },
+    {
+      "id": "8a8c68b7-4e78-4200-8d73-6bb0957e98a8",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "cachedResultName": "Weekly Permits"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "city": "={{$json.city}}",
+            "permit_number": "={{$json.permit_number}}",
+            "permit_type": "={{$json.permit_type}}",
+            "permit_class": "={{$json.permit_class}}",
+            "work_description": "={{$json.work_description}}",
+            "status": "={{$json.status}}",
+            "issued_date": "={{$json.issued_date}}",
+            "address": "={{$json.address}}",
+            "zip": "={{$json.zip}}",
+            "contractor_name": "={{$json.contractor_name}}",
+            "contractor_phone": "={{$json.contractor_phone}}",
+            "valuation": "={{$json.valuation}}",
+            "owner_name": "={{$json.owner_name}}",
+            "source_url": "={{$json.source_url}}"
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekly Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run Permits Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Permits Actor": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

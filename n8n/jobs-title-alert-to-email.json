@@ -1,0 +1,132 @@
+{
+  "name": "Jobs Title Alert to Email",
+  "nodes": [
+    {
+      "id": "81f7a943-d29a-4298-aba3-03ae2b5bfd7c",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ab2298c2-f6d9-449b-9eca-f9ebe9b1d120",
+      "name": "Run Title Alert Search",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "actor",
+        "operation": "runActorAndGetDataset",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "make_no_mistakes/multi-ats-job-board-api"
+        },
+        "input": "{\n  \"companies\": [\n    \"stripe\",\n    \"openai\",\n    \"ramp\",\n    \"anthropic\",\n    \"databricks\",\n    \"notion\",\n    \"linear\",\n    \"vercel\"\n  ],\n  \"titleIncludes\": [\n    \"staff engineer\",\n    \"principal engineer\"\n  ],\n  \"postedWithinDays\": 1,\n  \"maxItems\": 1000,\n  \"includeDescription\": false\n}"
+      },
+      "credentials": {
+        "apifyApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Apify account"
+        }
+      },
+      "notes": "Native Apify community node (@apify/n8n-nodes-apify). After import, open this node once: n8n may ask you to reselect the Actor from the picker and re-paste the Input JSON below, since this file was authored outside a live n8n instance so no personal Apify credential ID is baked in."
+    },
+    {
+      "id": "0e4f59b1-5035-4046-b61d-f50c6ea9a9b9",
+      "name": "Build Digest or Stop",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const items = $input.all();\nif (items.length === 0) {\n  return [];\n}\nconst rows = items.map(i => {\n  const j = i.json;\n  return `<li><b>${j.company}</b> \u2014 ${j.title} (${j.location_raw || 'n/a'})<br/><a href=\"${j.apply_url}\">${j.apply_url}</a></li>`;\n}).join('\\n');\nconst html = `<p>${items.length} new matching role(s) posted in the last day:</p><ul>${rows}</ul>`;\nreturn [{ json: { digestHtml: html, matchCount: items.length } }];\n"
+      },
+      "notes": "Returns [] (no output item) when there are zero matches, which stops the workflow before the Email node runs \u2014 so you only get mail on days something new posted."
+    },
+    {
+      "id": "5dfa2696-ce62-4e62-bbfd-bb707897bc3e",
+      "name": "Send Digest Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "fromEmail": "REPLACE_WITH_SENDER@yourdomain.com",
+        "toEmail": "REPLACE_WITH_RECIPIENT@yourdomain.com",
+        "subject": "=New job title matches ({{$json.matchCount}})",
+        "emailFormat": "html",
+        "html": "={{$json.digestHtml}}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run Title Alert Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Title Alert Search": {
+      "main": [
+        [
+          {
+            "node": "Build Digest or Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Digest or Stop": {
+      "main": [
+        [
+          {
+            "node": "Send Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
