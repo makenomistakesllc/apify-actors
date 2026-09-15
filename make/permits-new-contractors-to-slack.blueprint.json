@@ -3,51 +3,60 @@
   "flow": [
     {
       "id": 1,
-      "module": "http:ActionSendData",
-      "version": 3,
+      "module": "http:MakeRequest",
+      "version": 4,
       "parameters": {
-        "handleErrors": false,
-        "useNewZLibDeCompress": true
+        "tlsType": "",
+        "authenticationType": "noAuth"
       },
+      "filter": null,
       "mapper": {
         "url": "https://api.apify.com/v2/acts/make_no_mistakes~us-building-permits-scraper/run-sync-get-dataset-items?format=json",
-        "serializeUrl": false,
-        "method": "POST",
+        "method": "post",
         "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer YOUR-APIFY-API-TOKEN"
+          },
           {
             "name": "Content-Type",
             "value": "application/json"
-          },
-          {
-            "name": "Authorization",
-            "value": "Bearer {{connection.apifyToken}}"
           }
         ],
-        "qs": [],
-        "bodyType": "raw",
-        "contentType": "application/json",
-        "parseResponse": true,
-        "authUser": "",
-        "authPass": "",
-        "timeout": "",
+        "inputMethod": "jsonString",
         "shareCookies": false,
-        "ca": "",
-        "rejectUnauthorized": true,
-        "followRedirect": true,
-        "useQuerystring": false,
-        "gzip": true,
-        "useMtls": false,
-        "followAllRedirects": false,
-        "data": "{\n  \"cities\": [\n    \"austin\"\n  ],\n  \"daysBack\": 1,\n  \"maxItems\": 1000,\n  \"includeAdministrative\": false\n}"
+        "parseResponse": true,
+        "allowRedirects": true,
+        "stopOnHttpError": true,
+        "jsonStringBodyContent": "{  \"cities\": [\"austin\"],  \"daysBack\": 1,  \"maxItems\": 1000,  \"includeAdministrative\": false}",
+        "requestCompressedContent": true
       },
       "metadata": {
         "designer": {
-          "x": 100,
-          "y": 100
+          "x": 0,
+          "y": 0
         },
-        "restore": {},
-        "label": "Run Austin Permits Actor",
-        "note": "Calls the permits actor synchronously and returns the dataset items array directly as this module's 'data' output. Paste your Apify API token into the Authorization header value (Bearer <token>) or wire it through a Make connection/data store."
+        "restore": {
+          "expect": {
+            "method": {
+              "mode": "chose",
+              "label": "POST"
+            },
+            "contentType": {
+              "label": "application/json"
+            },
+            "inputMethod": {
+              "label": "JSON string"
+            }
+          },
+          "parameters": {
+            "authenticationType": {
+              "label": "No authentication"
+            }
+          }
+        },
+        "label": "Run Permits Actor",
+        "note": "HTTP v4 'Make a request'. Calls the permits actor synchronously; the dataset items array comes back as this module's 'data' output. Paste your Apify API token into the Authorization header (keep the 'Bearer ' prefix). In the published template this header Value is a wizard field with help text."
       }
     },
     {
@@ -55,66 +64,82 @@
       "module": "builtin:BasicFeeder",
       "version": 1,
       "parameters": {},
+      "filter": null,
       "mapper": {
         "array": "{{1.data}}"
       },
       "metadata": {
         "designer": {
           "x": 300,
-          "y": 100
+          "y": 0
         },
-        "restore": {},
+        "restore": {
+          "extra": {
+            "item": {
+              "mode": "chose"
+            }
+          }
+        },
         "label": "Iterate dataset items",
-        "note": "Built-in Flow Control > Iterator. Fires once per array item so the downstream HTTP call runs per-item instead of once for the whole batch. Ships with every Make plan; no connection needed."
+        "note": "Built-in Flow Control > Iterator. Fires once per array item so the downstream HTTP call runs per item instead of once for the whole batch. Ships with every Make plan; no connection needed."
       }
     },
     {
-      "id": 3,
-      "module": "http:ActionSendData",
-      "version": 3,
+      "id": 5,
+      "module": "http:MakeRequest",
+      "version": 4,
       "parameters": {
-        "handleErrors": false,
-        "useNewZLibDeCompress": true
+        "tlsType": "",
+        "authenticationType": "noAuth"
       },
+      "filter": null,
       "mapper": {
         "url": "https://slack.com/api/chat.postMessage",
-        "serializeUrl": false,
-        "method": "POST",
+        "method": "post",
         "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer xoxb-YOUR-SLACK-BOT-TOKEN"
+          },
           {
             "name": "Content-Type",
             "value": "application/json"
-          },
-          {
-            "name": "Authorization",
-            "value": "Bearer {{connection.apifyToken}}"
           }
         ],
-        "qs": [],
-        "bodyType": "raw",
-        "contentType": "application/json",
-        "parseResponse": true,
-        "authUser": "",
-        "authPass": "",
-        "timeout": "",
+        "inputMethod": "jsonString",
         "shareCookies": false,
-        "ca": "",
-        "rejectUnauthorized": true,
-        "followRedirect": true,
-        "useQuerystring": false,
-        "gzip": true,
-        "useMtls": false,
-        "followAllRedirects": false,
-        "data": "{\n  \"channel\": \"REPLACE_WITH_SLACK_CHANNEL_ID\",\n  \"text\": \"New Austin permit with a contractor lead: {{2.contractor_name}} \\u2014 {{2.contractor_phone}} | Permit {{2.permit_number}} ({{2.permit_type}}), issued {{2.issued_date}} | {{2.address}}, {{2.zip}} | {{2.work_description}} | valuation {{2.valuation}} | {{2.source_url}}\"\n}"
+        "parseResponse": true,
+        "allowRedirects": true,
+        "stopOnHttpError": true,
+        "jsonStringBodyContent": "{  \"channel\": \"REPLACE_WITH_SLACK_CHANNEL_ID\",  \"text\": \"New permit with a contractor lead: {{2.contractor_name}} - {{2.contractor_phone}} | Permit {{2.permit_number}} ({{2.permit_type}}), issued {{2.issued_date}} | {{2.address}}, {{2.zip}} | {{2.work_description}} | valuation {{2.valuation}} | {{2.source_url}}\"}",
+        "requestCompressedContent": true
       },
       "metadata": {
         "designer": {
-          "x": 500,
-          "y": 100
+          "x": 600,
+          "y": 0
         },
-        "restore": {},
-        "label": "Post Contractor to Slack (per item, filter to non-empty phone in the mapper below)",
-        "note": "Calls Slack's Web API directly (chat.postMessage) so no separate Make Slack app connection is required \u2014 only a Slack Bot Token with chat:write scope in the Authorization header. Add a Filter on the connector between module 2 and module 3 (condition: contractor_phone is not empty) so only rows with a dialable number post. Add Make's built-in duplicate-prevention (a Data Store keyed on contractor_phone + permit_number, checked before this module) if you want the same not-already-posted behavior as the n8n version."
+        "restore": {
+          "expect": {
+            "method": {
+              "mode": "chose",
+              "label": "POST"
+            },
+            "contentType": {
+              "label": "application/json"
+            },
+            "inputMethod": {
+              "label": "JSON string"
+            }
+          },
+          "parameters": {
+            "authenticationType": {
+              "label": "No authentication"
+            }
+          }
+        },
+        "label": "Post Contractor to Slack (per item)",
+        "note": "HTTP v4 'Make a request'. Calls Slack's Web API (chat.postMessage) directly, so no Slack app connection is needed - only a bot token with chat:write in the Authorization header (wizard field with help text in the published template). Set 'channel' to your Slack channel ID. Add a Filter between module 2 and this one (contractor_phone is not empty) so only permits with a dialable number post."
       }
     }
   ],
@@ -127,6 +152,7 @@
       "autoCommit": true,
       "autoCommitTriggerLast": true,
       "sequential": false,
+      "slots": null,
       "confidential": false,
       "dataloss": false,
       "dlq": false,
@@ -135,11 +161,12 @@
     "designer": {
       "orphans": []
     },
-    "zone": "us1.make.com",
+    "zone": "us2.make.com",
     "notes": [
-      "Schedule: this blueprint has no schedule encoded (Make stores scenario scheduling outside the blueprint). After import, click the clock icon on the scenario and set it to run daily.",
-      "Replace {{connection.apifyToken}}, {{connection.slackBotToken}} / Airtable token, and all REPLACE_WITH_* placeholders before running.",
-      "Module ids: http:ActionSendData is Make's generic HTTP module (very stable across accounts). builtin:BasicFeeder is the built-in Iterator. Both are used here instead of the native Apify/Slack/Airtable Make apps so this file imports cleanly without a live Make account to verify native-app module versions against; swap in the native apps afterward for a nicer point-and-click UI if you prefer."
+      "HTTP modules are the current v4 app: module id 'http:MakeRequest', version 4 (the old v3 'HTTP (legacy)' module id was 'http:ActionSendData').",
+      "Schedule is not encoded in the blueprint. After import, click the clock icon on the scenario and set it to run daily.",
+      "Replace every YOUR-*-TOKEN and REPLACE_WITH_* placeholder before running.",
+      "In the published Make template the Authorization header Value on each module is marked 'Use in Wizard' + 'Use as default value' and carries help text pointing at the token page."
     ]
   }
 }

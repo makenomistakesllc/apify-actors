@@ -3,51 +3,60 @@
   "flow": [
     {
       "id": 1,
-      "module": "http:ActionSendData",
-      "version": 3,
+      "module": "http:MakeRequest",
+      "version": 4,
       "parameters": {
-        "handleErrors": false,
-        "useNewZLibDeCompress": true
+        "tlsType": "",
+        "authenticationType": "noAuth"
       },
+      "filter": null,
       "mapper": {
         "url": "https://api.apify.com/v2/acts/make_no_mistakes~multi-ats-job-board-api/run-sync-get-dataset-items?format=json",
-        "serializeUrl": false,
-        "method": "POST",
+        "method": "post",
         "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer YOUR-APIFY-API-TOKEN"
+          },
           {
             "name": "Content-Type",
             "value": "application/json"
-          },
-          {
-            "name": "Authorization",
-            "value": "Bearer {{connection.apifyToken}}"
           }
         ],
-        "qs": [],
-        "bodyType": "raw",
-        "contentType": "application/json",
-        "parseResponse": true,
-        "authUser": "",
-        "authPass": "",
-        "timeout": "",
+        "inputMethod": "jsonString",
         "shareCookies": false,
-        "ca": "",
-        "rejectUnauthorized": true,
-        "followRedirect": true,
-        "useQuerystring": false,
-        "gzip": true,
-        "useMtls": false,
-        "followAllRedirects": false,
-        "data": "{\n  \"companies\": [\n    \"stripe\",\n    \"openai\",\n    \"ramp\",\n    \"anthropic\",\n    \"databricks\"\n  ],\n  \"postedWithinDays\": 1,\n  \"discoverOnly\": false,\n  \"maxItems\": 1000,\n  \"includeDescription\": true\n}"
+        "parseResponse": true,
+        "allowRedirects": true,
+        "stopOnHttpError": true,
+        "jsonStringBodyContent": "{ \"companies\": [\"stripe\", \"openai\", \"ramp\", \"anthropic\", \"databricks\"], \"postedWithinDays\": 1, \"discoverOnly\": false, \"maxItems\": 1000, \"includeDescription\": true }",
+        "requestCompressedContent": true
       },
       "metadata": {
         "designer": {
-          "x": 100,
-          "y": 100
+          "x": 0,
+          "y": 0
         },
-        "restore": {},
+        "restore": {
+          "expect": {
+            "method": {
+              "mode": "chose",
+              "label": "POST"
+            },
+            "contentType": {
+              "label": "application/json"
+            },
+            "inputMethod": {
+              "label": "JSON string"
+            }
+          },
+          "parameters": {
+            "authenticationType": {
+              "label": "No authentication"
+            }
+          }
+        },
         "label": "Run ATS Watchlist Actor",
-        "note": "Calls the ATS actor synchronously and returns the dataset items array directly as this module's 'data' output. Paste your Apify API token into the Authorization header value."
+        "note": "HTTP v4 'Make a request'. Calls the ATS actor synchronously; the dataset items array comes back as this module's 'data' output. Paste your Apify API token into the Authorization header (keep the 'Bearer ' prefix). In the published template this header Value is a wizard field with help text."
       }
     },
     {
@@ -55,66 +64,82 @@
       "module": "builtin:BasicFeeder",
       "version": 1,
       "parameters": {},
+      "filter": null,
       "mapper": {
         "array": "{{1.data}}"
       },
       "metadata": {
         "designer": {
           "x": 300,
-          "y": 100
+          "y": 0
         },
-        "restore": {},
+        "restore": {
+          "extra": {
+            "item": {
+              "mode": "chose"
+            }
+          }
+        },
         "label": "Iterate dataset items",
-        "note": "Built-in Flow Control > Iterator. Fires once per array item so the downstream HTTP call runs per-item instead of once for the whole batch. Ships with every Make plan; no connection needed."
+        "note": "Built-in Flow Control > Iterator. Fires once per array item so the downstream HTTP call runs per item instead of once for the whole batch. Ships with every Make plan; no connection needed."
       }
     },
     {
-      "id": 3,
-      "module": "http:ActionSendData",
-      "version": 3,
+      "id": 4,
+      "module": "http:MakeRequest",
+      "version": 4,
       "parameters": {
-        "handleErrors": false,
-        "useNewZLibDeCompress": true
+        "tlsType": "",
+        "authenticationType": "noAuth"
       },
+      "filter": null,
       "mapper": {
         "url": "https://api.airtable.com/v0/REPLACE_WITH_BASE_ID/REPLACE_WITH_TABLE_NAME",
-        "serializeUrl": false,
-        "method": "PATCH",
+        "method": "patch",
         "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer YOUR-AIRTABLE-TOKEN"
+          },
           {
             "name": "Content-Type",
             "value": "application/json"
-          },
-          {
-            "name": "Authorization",
-            "value": "Bearer {{connection.apifyToken}}"
           }
         ],
-        "qs": [],
-        "bodyType": "raw",
-        "contentType": "application/json",
-        "parseResponse": true,
-        "authUser": "",
-        "authPass": "",
-        "timeout": "",
+        "inputMethod": "jsonString",
         "shareCookies": false,
-        "ca": "",
-        "rejectUnauthorized": true,
-        "followRedirect": true,
-        "useQuerystring": false,
-        "gzip": true,
-        "useMtls": false,
-        "followAllRedirects": false,
-        "data": "{\n  \"performUpsert\": {\n    \"fieldsToMergeOn\": [\n      \"ats\",\n      \"job_id\"\n    ]\n  },\n  \"records\": [\n    {\n      \"fields\": {\n        \"company\": \"{{2.company}}\",\n        \"ats\": \"{{2.ats}}\",\n        \"job_id\": \"{{2.job_id}}\",\n        \"title\": \"{{2.title}}\",\n        \"department\": \"{{2.department}}\",\n        \"location_raw\": \"{{2.location_raw}}\",\n        \"is_remote\": \"{{2.is_remote}}\",\n        \"employment_type\": \"{{2.employment_type}}\",\n        \"salary_min\": \"{{2.salary_min}}\",\n        \"salary_max\": \"{{2.salary_max}}\",\n        \"salary_currency\": \"{{2.salary_currency}}\",\n        \"posted_at\": \"{{2.posted_at}}\",\n        \"apply_url\": \"{{2.apply_url}}\"\n      }\n    }\n  ]\n}"
+        "parseResponse": true,
+        "allowRedirects": true,
+        "stopOnHttpError": true,
+        "jsonStringBodyContent": "{ \"performUpsert\": { \"fieldsToMergeOn\": [\"ats\", \"job_id\"] }, \"records\": [ { \"fields\": { \"company\": \"{{2.company}}\", \"ats\": \"{{2.ats}}\", \"job_id\": \"{{2.job_id}}\", \"title\": \"{{2.title}}\", \"department\": \"{{2.department}}\", \"location_raw\": \"{{2.location_raw}}\", \"is_remote\": \"{{2.is_remote}}\", \"employment_type\": \"{{2.employment_type}}\", \"salary_min\": \"{{2.salary_min}}\", \"salary_max\": \"{{2.salary_max}}\", \"salary_currency\": \"{{2.salary_currency}}\", \"posted_at\": \"{{2.posted_at}}\", \"apply_url\": \"{{2.apply_url}}\" } } ] }",
+        "requestCompressedContent": true
       },
       "metadata": {
         "designer": {
-          "x": 500,
-          "y": 100
+          "x": 600,
+          "y": 0
         },
-        "restore": {},
+        "restore": {
+          "expect": {
+            "method": {
+              "mode": "chose",
+              "label": "PATCH"
+            },
+            "contentType": {
+              "label": "application/json"
+            },
+            "inputMethod": {
+              "label": "JSON string"
+            }
+          },
+          "parameters": {
+            "authenticationType": {
+              "label": "No authentication"
+            }
+          }
+        },
         "label": "Upsert Job to Airtable (per item)",
-        "note": "Calls Airtable's REST API directly (PATCH-style upsert via the records endpoint's performUpsert option) so no separate Make Airtable app connection is required \u2014 only a Personal Access Token with data.records:write scope on the target base, in the Authorization header. Method is already set to PATCH, which is the verb Airtable's API requires for performUpsert against the records endpoint."
+        "note": "HTTP v4 'Make a request'. Calls Airtable's REST API directly with PATCH + performUpsert (merge key: ats + job_id), so re-runs update rows instead of duplicating them. Needs a personal access token with data.records:write on the base, in the Authorization header (wizard field with help text in the published template). Fill in the base ID and table name in the URL."
       }
     }
   ],
@@ -127,6 +152,7 @@
       "autoCommit": true,
       "autoCommitTriggerLast": true,
       "sequential": false,
+      "slots": null,
       "confidential": false,
       "dataloss": false,
       "dlq": false,
@@ -135,11 +161,12 @@
     "designer": {
       "orphans": []
     },
-    "zone": "us1.make.com",
+    "zone": "us2.make.com",
     "notes": [
-      "Schedule: this blueprint has no schedule encoded (Make stores scenario scheduling outside the blueprint). After import, click the clock icon on the scenario and set it to run daily.",
-      "Replace {{connection.apifyToken}}, {{connection.slackBotToken}} / Airtable token, and all REPLACE_WITH_* placeholders before running.",
-      "Module ids: http:ActionSendData is Make's generic HTTP module (very stable across accounts). builtin:BasicFeeder is the built-in Iterator. Both are used here instead of the native Apify/Slack/Airtable Make apps so this file imports cleanly without a live Make account to verify native-app module versions against; swap in the native apps afterward for a nicer point-and-click UI if you prefer."
+      "HTTP modules are the current v4 app: module id 'http:MakeRequest', version 4 (the old v3 'HTTP (legacy)' module id was 'http:ActionSendData').",
+      "Schedule is not encoded in the blueprint. After import, click the clock icon on the scenario and set it to run daily.",
+      "Replace every YOUR-*-TOKEN and REPLACE_WITH_* placeholder before running.",
+      "In the published Make template the Authorization header Value on each module is marked 'Use in Wizard' + 'Use as default value' and carries help text pointing at the token page."
     ]
   }
 }
