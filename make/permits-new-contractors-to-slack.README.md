@@ -1,7 +1,10 @@
 # Permits New Contractors → Slack (Make blueprint)
 
 **File:** `permits-new-contractors-to-slack.blueprint.json`
-**Public Make template:** ID 19724 (editor: `us2.make.com/2954832/templates/16863/edit`)
+**Public Make template:** ID 19724 — **live, approved Sep 16 2026** (ticket #2307299)
+**Public URL:** https://www.make.com/en/integration/19724-permits-new-contractors-to-slack
+(logged-in users are region-redirected to `https://us2.make.com/templates/19724`)
+**Editor:** `us2.make.com/2954832/templates/16863/edit`
 
 ## What it does
 Three-module scenario: an HTTP call that runs `make_no_mistakes/us-building-permits-scraper`
