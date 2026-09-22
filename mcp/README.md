@@ -1,4 +1,4 @@
-# Calling both actors through Apify's MCP server
+# Calling all three actors through Apify's MCP server
 
 Verified against `docs.apify.com/platform/integrations/mcp`, current as of Sep 2026.
 
@@ -11,14 +11,14 @@ https://mcp.apify.com
 
 It exposes generic tools (`search-actors`, `fetch-actor-details`, docs search — these work
 **anonymously**, no token needed) plus one callable tool per actor you scope it to. Scope it with
-a `tools` query parameter so an agent only sees the two actors that matter here:
+a `tools` query parameter so an agent only sees the three actors that matter here:
 
 ```
-https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api
+https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector
 ```
 
 Add `search-actors` to that list if you want the agent able to discover other actors too:
-`?tools=search-actors,make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api`
+`?tools=search-actors,make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector`
 
 ## Authentication
 Two options:
@@ -33,7 +33,7 @@ Two options:
 Claude Desktop's MCP setup for hosted servers is a UI flow, not a config file you hand-edit:
 
 1. Settings → Connectors → **Add custom connector**.
-2. Server URL: `https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api`
+2. Server URL: `https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector`
 3. Approve the OAuth prompt (or, if the connector UI exposes a custom-headers field, add
    `Authorization: Bearer <APIFY_TOKEN>` instead of using OAuth).
 
@@ -47,7 +47,7 @@ Create or edit `.cursor/mcp.json`:
 {
   "mcpServers": {
     "apify": {
-      "url": "https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api"
+      "url": "https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector"
     }
   }
 }
@@ -59,7 +59,7 @@ With a bearer token instead of OAuth:
 {
   "mcpServers": {
     "apify": {
-      "url": "https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api",
+      "url": "https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector",
       "headers": {
         "Authorization": "Bearer <APIFY_TOKEN>"
       }
@@ -70,19 +70,19 @@ With a bearer token instead of OAuth:
 
 Or use Apify's CLI helper, which writes this file for you:
 ```bash
-apify mcp install cursor --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api
+apify mcp install cursor --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector
 ```
 
 ## VS Code (GitHub Copilot agent mode)
 Command Palette → **MCP: Open User Configuration**, same JSON shape as Cursor above. Or:
 ```bash
-apify mcp install vscode --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api
+apify mcp install vscode --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector
 ```
 
 ## Claude Code CLI
 Apify's install helper covers Claude Code directly:
 ```bash
-apify mcp install claude-code --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api
+apify mcp install claude-code --token <APIFY_TOKEN> --tools make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector
 ```
 If you'd rather add it by hand with Claude Code's own `claude mcp add`, point it at the same URL
 with an `Authorization: Bearer <APIFY_TOKEN>` header — check `claude mcp add --help` for the exact
@@ -95,7 +95,7 @@ Only needed for clients that can't do remote HTTP MCP:
   "mcpServers": {
     "actors-mcp-server": {
       "command": "npx",
-      "args": ["-y", "@apify/actors-mcp-server", "--actors", "make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api"],
+      "args": ["-y", "@apify/actors-mcp-server", "--actors", "make_no_mistakes/us-building-permits-scraper,make_no_mistakes/multi-ats-job-board-api,make_no_mistakes/company-ats-detector"],
       "env": { "APIFY_TOKEN": "YOUR_APIFY_TOKEN" }
     }
   }
@@ -107,9 +107,11 @@ Once scoped, the MCP server exposes one tool per actor, named after the actor. A
 the permits actor sees the same input shape as the REST API — `cities`, `daysBack`, `maxItems`,
 `permitTypes`, `includeAdministrative` — and gets dataset items back directly. Same for the ATS
 actor: `companies`, `platforms`, `discoverOnly`, `postedWithinDays`, `titleIncludes`, `remoteOnly`,
-`maxItems`. Both actors' READMEs already carry a "For AI agents and MCP clients" section with the
-minimal-input examples an agent should default to (`maxItems` set low) so a first exploratory call
-doesn't run up spend.
+`maxItems`. The free detector actor takes the same `companies` input, plus `includeJobCount` and
+`maxCompanies`, and is the cheap first call before the paid ATS actor's `discoverOnly` or full job
+pull. All three actors' READMEs already carry a "For AI agents and MCP clients" section with the
+minimal-input examples an agent should default to (`maxItems` set low, or no cost cap at all on the
+detector) so a first exploratory call doesn't run up spend.
 
 ## The honest limit on this move
 Per the internal research this kit implements (a Sep 2026 SaaS-growth research note, move #5 and

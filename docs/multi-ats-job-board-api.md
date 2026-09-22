@@ -129,7 +129,18 @@ You get one row per company: `company_input`, `company_slug`, `ats`, `board_url`
 * **`resolved: false` is the honest answer**, not an error. `candidates_tried` tells you which slugs
   were probed so you can supply the right one.
 
-<!-- company-ats-detector: coming -->
+### Just want to know which ATS a company uses?
+
+[**Company ATS Detector**](https://apify.com/make_no_mistakes/company-ats-detector) is the free
+Actor that answers only that question: one row per company with the platform, the board URL, the
+public no-auth API endpoint and the open-job count. It runs the same discovery code as this Actor.
+
+**Kept in sync by hand.** Apify builds each Actor from its own directory, so the two cannot share a
+Python package: `src/discovery.py`, `src/http.py`, `src/normalize.py` and `src/platforms/` are
+copied into `company-ats-detector/src/` with a header naming the origin file. This Actor is the
+origin. After changing any of those files here, re-copy them with
+`python3 ../company-ats-detector/ops/sync_vendored.py --write`; the same script without `--write`
+fails loudly when the two have drifted.
 
 ---
 

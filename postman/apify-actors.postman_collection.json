@@ -2,7 +2,7 @@
   "info": {
     "name": "Apify Actors \u2014 Make No Mistakes",
     "_postman_id": "d3f1a6b2-8c4e-4a7f-9b2d-6a1e2c3f4b5a",
-    "description": "Run-sync-get-dataset-items calls for the two Make No Mistakes Apify Actors: US Building Permits Scraper and Multi-ATS Job Board API. Each request returns dataset items directly in the HTTP response body (no separate dataset fetch or polling). Set the `apify_token` collection variable to your own Apify API token (Console -> Settings -> API & Integrations) before sending. Example bodies were verified live against both actors with maxItems:5.",
+    "description": "Run-sync-get-dataset-items calls for the three Make No Mistakes Apify Actors: US Building Permits Scraper, Multi-ATS Job Board API and Company ATS Detector. Each request returns dataset items directly in the HTTP response body (no separate dataset fetch or polling). Set the `apify_token` collection variable to your own Apify API token (Console -> Settings -> API & Integrations) before sending. Example bodies were verified live against the pay-per-event actors with maxItems:5; the Company ATS Detector is free.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -118,6 +118,60 @@
           ]
         },
         "description": "Minimal-cost smoke test: 3 well-known companies, capped at 5 items. Verified live 2026-09-04 (HTTP 201, 5 items returned). Cost: $0.005 run start + $0.004/job -> $0.025 for this exact call. Set `discoverOnly: true` instead of `maxItems` for a near-free ATS lookup (\"which platform is this company on\") at $0.001/company. Full input fields: companies, discoverOnly, platforms, maxItems, postedWithinDays, titleIncludes, location, remoteOnly, includeDescription."
+      },
+      "response": []
+    },
+    {
+      "name": "Company ATS Detector - run-sync-get-dataset-items",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{apify_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"companies\": [\n    \"stripe.com\",\n    \"notion.so\"\n  ],\n  \"includeJobCount\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.apify.com/v2/acts/make_no_mistakes~company-ats-detector/run-sync-get-dataset-items?format=json",
+          "protocol": "https",
+          "host": [
+            "api",
+            "apify",
+            "com"
+          ],
+          "path": [
+            "v2",
+            "acts",
+            "make_no_mistakes~company-ats-detector",
+            "run-sync-get-dataset-items"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "description": "Free Actor: no pay-per-event pricing, you pay only your own Apify platform compute. A measured 20-company run took 33 seconds and about 0.0046 compute units, a fraction of a cent. Returns which of nine ATS platforms each company is on, the board URL, the public no-auth API endpoint and the open-job count. Full input fields: companies, includeJobCount, maxCompanies."
       },
       "response": []
     }
