@@ -10,7 +10,7 @@ no code, no database.
 
 Default cities in the template: `austin, san-antonio, new-york, chicago, boston`. Edit the `cities`
 array inside the **Run Permits Actor** node's Input JSON to change coverage — see the actor's
-README for all 11 supported city keys.
+README for all 16 supported city keys.
 
 ## Required credentials
 - **Apify account** (API token) — n8n community node `@apify/n8n-nodes-apify`, credential type
@@ -32,9 +32,9 @@ README for all 11 supported city keys.
 
 ## Cost per run
 5 cities × 7 days is typically a few hundred to ~1,500 permits depending on the week (see the
-actor's per-city permits/week table). At $0.02 per run start + $0.005/permit:
-- 500 permits ≈ **$0.02 + $2.50 = $2.52/run** → ~$10/month at 1 run/week
-- 1,500 permits ≈ **$0.02 + $7.50 = $7.52/run** → ~$30/month at 1 run/week
+actor's per-city permits/week table). At $0.02 per run start + $0.008/permit:
+- 500 permits ≈ **$0.02 + $4.00 = $4.02/run** → ~$17/month at 1 run/week
+- 1,500 permits ≈ **$0.02 + $12.00 = $12.02/run** → ~$52/month at 1 run/week
 
 Set `maxItems` (default 5000 in this template) lower if you want a hard ceiling on spend
 regardless of volume.

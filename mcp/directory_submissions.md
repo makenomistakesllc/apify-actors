@@ -38,7 +38,7 @@ brand name, never a personal one.
 > (`https://mcp.apify.com`).
 >
 > - **US Building Permits Scraper** (`make_no_mistakes/us-building-permits-scraper`) — normalized
->   building/construction permits from 11 US cities' official open-data APIs, one schema, no HTML
+>   building/construction permits from 16 US cities' official open-data APIs, one schema, no HTML
 >   scraping. [Apify Store link] · [Docs]
 > - **Multi-ATS Job Board API** (`make_no_mistakes/multi-ats-job-board-api`) — resolves a company
 >   name or domain to its applicant tracking system (9 platforms: Greenhouse, Ashby, Lever,
@@ -57,10 +57,10 @@ opening the PR — Console → Actor → the public Store URL.)*
 > **Title:** Add two normalized-API Apify Actors (building permits, ATS job boards)
 >
 > **Body:**
-> Two Actors that scrape via documented public APIs (Socrata/CKAN/Carto for permits; each ATS
+> Two Actors that scrape via documented public APIs (Socrata/ArcGIS REST/CKAN/Carto for permits; each ATS
 > vendor's own job-board API) rather than HTML, normalized onto a single schema per category:
 >
-> - US Building Permits Scraper — 11 US cities' permit registers → one schema.
+> - US Building Permits Scraper — 16 US cities' permit registers → one schema.
 >   `make_no_mistakes/us-building-permits-scraper` on Apify. [link]
 > - Multi-ATS Job Board API — auto-detects which of 9 ATS platforms an employer uses and returns
 >   every open job on one schema. `make_no_mistakes/multi-ats-job-board-api` on Apify. [link]
@@ -71,7 +71,7 @@ opening the PR — Console → Actor → the public Store URL.)*
 ### #6 — mcp.so submission form fields
 
 > **Name:** US Building Permits Scraper (Apify Actor)
-> **Description:** Building and construction permits from 11 US cities' official open-data APIs,
+> **Description:** Building and construction permits from 16 US cities' official open-data APIs,
 > normalized onto one schema — address, valuation, contractor name/phone, work description. Callable
 > as an MCP tool via `https://mcp.apify.com?tools=make_no_mistakes/us-building-permits-scraper`.
 > **Category:** Data / Web Scraping
@@ -84,7 +84,7 @@ opening the PR — Console → Actor → the public Store URL.)*
 ### #9 — Postman collection description (paste into the collection's public description field)
 
 > Run either of two Apify Actors synchronously and get results back in one call — no polling, no
-> separate dataset fetch. **US Building Permits Scraper** returns normalized permits from 11 US
+> separate dataset fetch. **US Building Permits Scraper** returns normalized permits from 16 US
 > cities; **Multi-ATS Job Board API** resolves a company to its ATS and returns every open job.
 > Both are pay-per-event (see each request's description for current pricing). Fork this
 > collection, set your Apify API token as the `apify_token` collection variable, and send.

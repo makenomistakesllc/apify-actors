@@ -63,7 +63,7 @@
             }
           ]
         },
-        "description": "Minimal-cost smoke test: 1 city, 7 days back, capped at 5 items. Verified live 2026-09-04 (HTTP 201, 5 items returned). Cost: $0.02 run start + $0.005/permit -> $0.045 for this exact call. Swap `cities` to any of the 11 supported keys (see the actor README) and raise `maxItems` for a real pull. Full input fields: cities, daysBack, startDate, endDate, maxItems, permitTypes, includeAdministrative."
+        "description": "Minimal-cost smoke test: 1 city, 7 days back, capped at 5 items. Cost: $0.02 run start + $0.008/permit -> $0.06 for this exact call. Swap `cities` to any of the 16 supported keys (see the actor README) and raise `maxItems` for a real pull. Full input fields: cities, daysBack, startDate, endDate, maxItems, permitTypes, includeAdministrative, contractorPhoneOnly, onlyNewSinceLastRun, deltaStateName."
       },
       "response": []
     },

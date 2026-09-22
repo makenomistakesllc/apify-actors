@@ -74,6 +74,6 @@ when the template is published.
    the blueprint JSON.
 
 ## Cost per run
-$0.02/run start + $0.005/permit returned. Austin's ~165 permits/day (before the phone filter)
-costs **≈$0.02 + $0.83 = $0.85/run**, ≈$26/month daily. Make's own operation cost is separate and
+$0.02/run start + $0.008/permit returned. Austin's ~165 permits/day (before the phone filter)
+costs **≈$0.02 + $1.32 = $1.34/run**, ≈$40/month daily. Make's own operation cost is separate and
 scales with the number of Iterator cycles.

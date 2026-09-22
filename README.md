@@ -8,11 +8,13 @@ AI agents, and API clients.
 ## The Actors
 
 ### [US Building Permits Scraper](https://apify.com/make_no_mistakes/us-building-permits-scraper)
-Normalized building and construction permit data from 11 US cities' official open-data APIs
-(Socrata, CKAN, Carto) — Austin, San Antonio, New York, Los Angeles, Chicago, Philadelphia,
-Boston, Seattle, San Francisco, Cincinnati and Baton Rouge. One call, one schema: permit number,
-type, work description, status, dates, address, valuation, owner name, and contractor name/phone
-where the city publishes it. No HTML scraping, no proxies, no logins.
+Normalized building and construction permit data from 16 US cities' official open-data APIs
+(Socrata, ArcGIS REST, CKAN, Carto): Austin, San Antonio, New York City, Los Angeles, Chicago,
+Philadelphia, Boston, Seattle, San Francisco, Cincinnati, Baton Rouge, Washington DC, Denver,
+Nashville, Raleigh and Louisville. One call, one schema: permit number, type, work description,
+status, dates, address, valuation, owner name, and contractor name/phone where the city publishes
+it (Austin and Raleigh are the only two that publish phone numbers). No HTML scraping, no proxies,
+no logins.
 
 ### [Multi-ATS Job Board API](https://apify.com/make_no_mistakes/multi-ats-job-board-api)
 Give it a company name or domain and it resolves which applicant tracking system that company
