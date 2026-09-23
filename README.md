@@ -5,6 +5,10 @@ under the **Make No Mistakes** Store account. This repo does not contain the Act
 it contains the templates, configs and docs that make them easy to plug into workflow tools,
 AI agents, and API clients.
 
+Website: **https://makenomistakesllc.com** · MCP endpoint: `https://makenomistakesllc.com/mcp` (forwards to Apify's MCP server; bring your Apify token)
+
+[![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/makenomistakesllc/apify-actors)
+
 ## The Actors
 
 ### [US Building Permits Scraper](https://apify.com/make_no_mistakes/us-building-permits-scraper)
